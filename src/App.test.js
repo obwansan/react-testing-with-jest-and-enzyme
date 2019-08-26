@@ -35,7 +35,7 @@ const findByTestAttr = (wrapper, val) => {
   return wrapper.find(`[data-test="${val}"]`);
 }
 
-test('renders without error', () => {
+test('renders app without error', () => {
   const wrapper = setup();
   const appComponent = findByTestAttr(wrapper, 'component-app');
   expect(appComponent.length).toBe(1);
@@ -59,7 +59,7 @@ test('counter starts at 0', () => {
   expect(initialCounterState).toBe(0);
 });
 
-test('clicking button increments counter display', () => {
+test('clicking increment counter button increments counter display', () => {
   const counter = 7;
 
   // ES6 shorthand - key and value are both counter
@@ -75,7 +75,7 @@ test('clicking button increments counter display', () => {
   expect(counterDisplay.text()).toContain(counter + 1);
 });
 
-test('clicking button decrements counter display', () => {
+test('clicking decrement counter button decrements counter display', () => {
   const counter = 2;
   const wrapper = setup(null, { counter });
   const button = findByTestAttr(wrapper, 'decrement-button');
@@ -83,4 +83,37 @@ test('clicking button decrements counter display', () => {
   wrapper.update();
   const counterDisplay = findByTestAttr(wrapper, 'counter-display');
   expect(counterDisplay.text()).toContain(counter - 1);
+});
+
+test('counter does not decrement below zero', () => {
+  const counter = 0;
+  const wrapper = setup(null, { counter });
+  const button = findByTestAttr(wrapper, 'decrement-button');
+  button.simulate('click');
+  wrapper.update();
+  const counterDisplay = findByTestAttr(wrapper, 'counter-display');
+  expect(counterDisplay.text()).toContain(counter);
+});
+
+test('error message displays if counter decrements below zero', () => {
+  const showErrMsg = false;
+  const errMsg = 'Counter cannot go below zero';
+
+  const wrapper = setup(null, { showErrMsg });
+
+  const button = findByTestAttr(wrapper, 'decrement-button');
+  button.simulate('click');
+
+  wrapper.update();
+
+  const errMsgDisplay = findByTestAttr(wrapper, 'error-message');
+  expect(errMsgDisplay.text()).toContain(errMsg);
+});
+
+test('error clears on click of increment button', () => {
+    const counter = -1;
+    const wrapper = setup(null, { counter });
+    const button = findByTestAttr(wrapper, 'increment-button');
+    button.simulate('click');
+    wrapper.update();
 });
